@@ -1,11 +1,18 @@
 export const fetchProfile = async () => {
-  const token = localStorage.getItem("token");
-  const response = await fetch("/api/profile/", {
+  const response = await fetch('http://0.0.0.0:8080/api/processing/profile/', {
+    method: 'GET',
     headers: {
-      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Authorization': `Token ${localStorage.getItem('token')}`,
     },
   });
-  return response.json();
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch learned words");
+  }
+
+  const data = await response.json();
+  return data; // Возвращаем выученные слова
 };
 
 // profileService.js
@@ -24,4 +31,21 @@ export const fetchLearnedWords = async () => {
 
   const data = await response.json();
   return data; // Возвращаем выученные слова
+};
+
+export const fetchWordsCount = async () => {
+  const response = await fetch('http://0.0.0.0:8080/api/processing/words/count/', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Token ${localStorage.getItem('token')}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch learned words");
+  }
+
+  const data = await response.json();
+  return data.count; // Возвращаем выученные слова
 };

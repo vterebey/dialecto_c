@@ -1,38 +1,56 @@
-import React from "react";
-import { Card, CardContent, Typography, Button } from "@mui/material";
-import WordCard from "./WordCard";  // Импорт компонента WordCard
-import {markAsLearned} from "../services/cardService"
+import React, { useEffect, useState } from "react";
+import { Typography } from "@mui/material";
+import WordCard from "./WordCard";
+import { markAsLearned, removeLearnedWord } from "../services/cardService";
 
-const Flashcards = ({ cards = [], currentIndex, onNextCard }) => {
-  if (cards.length === 0) {
-    return <Typography variant="h6"></Typography>;
-  }
+const Flashcards = ({ cards = [], currentIndex, onNextCard, isLearning }) => {
+  const [localCards, setLocalCards] = useState(cards);
 
-  const handleMarkAsLearned = (index, wordId) => {
-    console.log(`Word at index ${index} is marked as learned.`);
-    markAsLearned(wordId);
-    const realIndex = cards.findIndex(card => card.id === wordId);
-    if (realIndex !== -1) {
-      cards.splice(realIndex, 1);
+  useEffect(() => {
+    setLocalCards(cards);
+  }, [cards]);
+
+  const handleMarkAsLearned = async (wordId) => {
+    try {
+      if (isLearning) {
+        await markAsLearned(wordId);
+      } else {
+        await removeLearnedWord(wordId);
+      }
+
+      // Удаляем текущую карточку и переходим к следующей
+      const updatedCards = localCards.filter((card) => card.id !== wordId);
+      setLocalCards(updatedCards);
+
+      if (updatedCards.length === 0) {
+        onNextCard(); // Уведомляем родительский компонент о завершении
+      }
+    } catch (error) {
+      console.error("Error processing word:", error);
     }
   };
 
+  if (localCards.length === 0) {
+    return (
+      <Typography variant="h6" sx={{ textAlign: "center", marginTop: 4 }}>
+        No cards available.
+      </Typography>
+    );
+  }
+
+  const currentCard = localCards[currentIndex];
+
   return (
     <div>
-      {/* Отображаем текущую карточку, передавая её индекс */}
       <WordCard
-        id={cards[currentIndex].id}
-        word={cards[currentIndex].word}
-        audio_pronciations={cards[currentIndex].audio_pronciations}
-        definitions={cards[currentIndex].definitions}
-        currentIndex={currentIndex} // Передаем индекс карточки
-        onMarkAsLearned={handleMarkAsLearned} // Передаем функцию для пометки как выученного
-        onNextCard={onNextCard} // Переход к следующей карточке
+        id={currentCard.id}
+        word={currentCard.word}
+        audio_pronciations={currentCard.audio_pronciations}
+        definitions={currentCard.definitions}
+        onMarkAsLearned={() => handleMarkAsLearned(currentCard.id)}
+        isLearning={isLearning}
+        onNextCard={onNextCard}
       />
-      {/* Кнопка для перехода к следующей карточке */}
-      {/*<Button onClick={onNextCard} variant="contained" sx={{ marginTop: 2 }}>*/}
-      {/*  Next Card*/}
-      {/*</Button>*/}
     </div>
   );
 };

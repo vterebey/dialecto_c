@@ -37,6 +37,27 @@ export const markAsLearned = async (wordId) => {
     }
 };
 
+export const removeLearnedWord = async (wordId) => {
+    const token = localStorage.getItem("token");
+    try {
+        const response = await fetch(`http://0.0.0.0:8080/api/processing/words/${wordId}/learned/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Token ${token}`, // Передайте токен, если используется аутентификация
+            },
+        });
+
+        if (response.ok) {
+            console.log("Removed from learned words!");
+        } else {
+            console.error("Failed to remove word from learned");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+};
+
 export const fetchCategories = async () => {
     const token = localStorage.getItem("token");
     try {

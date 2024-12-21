@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { fetchCategories, fetchLearnedCategories, markCategoryAsLearned } from "../services/cardService"; // Функции для API
-import { Button, Checkbox, List, ListItem, Typography } from "@mui/material";
+import { Button, Checkbox, List, ListItem, Typography, Container, Paper, Box } from "@mui/material";
+import { blue, grey } from '@mui/material/colors';
 
 const Vocabulary = () => {
   const [levels, setLevels] = useState([]); // Список уровней
@@ -59,22 +60,30 @@ const Vocabulary = () => {
   };
 
   return (
-    <div>
-      <Typography variant="h4" gutterBottom>Vocabulary Levels</Typography>
-      <List>
-        {levels.map((level) => (
-          <ListItem key={level} sx={{ display: "flex", alignItems: "center" }}>
-            <Checkbox
-              checked={selectedLevels.includes(level)} // Устанавливаем галочку, если уровень выбран
-              onChange={() => handleLevelToggle(level)} // Обработчик изменения уровня
-            />
-            <Typography variant="body1">
-              {level}
-            </Typography>
-          </ListItem>
-        ))}
-      </List>
-    </div>
+    <Container maxWidth="md" sx={{ paddingTop: 4 }}>
+      <Paper sx={{ padding: 3, backgroundColor: grey[100], borderRadius: 2 }}>
+        <Typography variant="h4" gutterBottom sx={{ textAlign: "center" }}>Vocabulary Levels</Typography>
+        <List>
+          {levels.map((level) => (
+            <ListItem key={level} sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+              <Checkbox
+                checked={selectedLevels.includes(level)} // Устанавливаем галочку, если уровень выбран
+                onChange={() => handleLevelToggle(level)} // Обработчик изменения уровня
+                sx={{
+                  color: blue[600],
+                  "&.Mui-checked": {
+                    color: blue[700],
+                  },
+                }}
+              />
+              <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                {level}
+              </Typography>
+            </ListItem>
+          ))}
+        </List>
+      </Paper>
+    </Container>
   );
 };
 
